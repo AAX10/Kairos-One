@@ -35,25 +35,43 @@ def validate_env_vars(s):
 validate_env_vars(settings)
 
 # Initialize Firebase App globally before any requests
+import os
+import json
 import firebase_admin
 from firebase_admin import credentials
-import json
+
 if not firebase_admin._apps:
     if settings.firebase_credentials:
+        # JSON credentials stored directly in an environment variable
         try:
             cred_dict = json.loads(settings.firebase_credentials)
             cred = credentials.Certificate(cred_dict)
         except Exception as e:
             raise ValueError(f"Failed to parse FIREBASE_CREDENTIALS: {e}")
-    elif settings.firebase_credentials_path:
-        cred = credentials.Certificate(settings.firebase_credentials_path)
+
     else:
-        raise ValueError("No Firebase credentials provided")
-    
-    firebase_admin.initialize_app(cred, {
-        'projectId': settings.firebase_project_id,
-    })
-# Setup structured logging
+        # Prefer Render/Cloud secret file if available
+        firebase_path = (
+            os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+            or settings.firebase_credentials_path
+        )
+
+        if not firebase_path:
+            raise ValueError(
+                "No Firebase credentials provided. "
+                "Set FIREBASE_CREDENTIALS, GOOGLE_APPLICATION_CREDENTIALS, "
+                "or FIREBASE_CREDENTIALS_PATH."
+            )
+
+        cred = credentials.Certificate(firebase_path)
+
+    firebase_admin.initialize_app(
+        cred,
+        {
+            "projectId": settings.firebase_project_id,
+        },
+    )
+
 setup_logging()
 
 # -----------------------------------------------------------------------------
