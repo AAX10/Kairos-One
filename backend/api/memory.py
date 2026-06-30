@@ -10,7 +10,7 @@ from schemas.memory import MemoryItem
 from services.firestore_service import FirestoreService, get_firestore_service
 from services.gemini_service import GeminiService, get_gemini_service
 
-router = APIRouter(prefix="/memory", tags=["Memory"], dependencies=[Depends(get_current_user)])
+router = APIRouter(prefix="/memory", tags=["Memory"])
 
 class MemorySearchResponse(BaseModel):
     answer: str

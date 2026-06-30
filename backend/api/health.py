@@ -10,7 +10,7 @@ from services.gemini_service import get_gemini_service
 from services.firestore_service import get_firestore_service
 from utils.helpers import iso_now
 
-router = APIRouter(tags=["Health"], dependencies=[Depends(get_current_user)])
+router = APIRouter(tags=["Health"])
 
 
 @router.get("/health")

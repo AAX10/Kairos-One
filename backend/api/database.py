@@ -10,7 +10,7 @@ from schemas.timeline import RecoveryPlan, RecoveryRunRequest, TimeBlock
 from services.calendar_service import get_calendar_service
 from services.firestore_service import get_firestore_service
 
-router = APIRouter(tags=["Recovery & Timeline"], dependencies=[Depends(get_current_user)])
+router = APIRouter(tags=["Recovery & Timeline"])
 
 
 @router.post("/recovery/run", response_model=RecoveryPlan)

@@ -5,7 +5,7 @@ from services.firestore_service import get_firestore_service
 from services.logging_service import get_logger
 
 logger = get_logger("users_api")
-router = APIRouter(prefix="/users", tags=["Users"], dependencies=[Depends(get_current_user)])
+router = APIRouter(prefix="/users", tags=["Users"])
 
 
 @router.get("/{uid}", response_model=UserProfile)

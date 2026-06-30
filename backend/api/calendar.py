@@ -17,7 +17,7 @@ from fastapi import APIRouter, Depends
 from api.dependencies import get_current_user, HTTPException
 from services.firestore_service import get_firestore_service
 
-router = APIRouter(prefix="/calendar", tags=["Calendar"], dependencies=[Depends(get_current_user)])
+router = APIRouter(prefix="/calendar", tags=["Calendar"])
 
 
 @router.get("/primary", response_model=dict[str, str])

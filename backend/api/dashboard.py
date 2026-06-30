@@ -3,8 +3,7 @@
 # GET /dashboard returns the full composite dashboard data.
 # =============================================================================
 
-from fastapi import APIRouter, Depends
-from api.dependencies import get_current_user, HTTPException
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 import httpx
 
@@ -13,7 +12,7 @@ from schemas.memory import MemoryInsight
 from services.firestore_service import get_firestore_service
 from orchestrator.mission_orchestrator import get_orchestrator
 
-router = APIRouter(tags=["Dashboard"], dependencies=[Depends(get_current_user)])
+router = APIRouter(tags=["Dashboard"])
 
 
 @router.get("/dashboard", response_model=DashboardResponse)

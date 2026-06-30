@@ -16,7 +16,7 @@ from utils.exceptions import MissionNotFoundException
 from api.dependencies import get_current_user
 from fastapi import Depends
 
-router = APIRouter(prefix="/missions", tags=["Missions"], dependencies=[Depends(get_current_user)])
+router = APIRouter(prefix="/missions", tags=["Missions"])
 
 
 @router.get("", response_model=list[MissionNode])
