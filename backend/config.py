@@ -52,6 +52,7 @@ class Settings(BaseSettings):
     environment: str = "development"
     debug: bool = True
     log_level: str = "INFO"
+    auth_enabled: bool = True
 
     # -------------------------------------------------------------------------
     # CORS

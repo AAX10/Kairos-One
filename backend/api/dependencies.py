@@ -10,15 +10,35 @@ from firebase_admin import auth
 from schemas.user import UserProfile
 from services.logging_service import get_logger
 from utils.context import current_user_id
+from config import get_settings
 
 logger = get_logger("auth")
-security = HTTPBearer()
+security = HTTPBearer(auto_error=False)
 
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> UserProfile:
     """
     Verify Firebase JWT and return the authenticated user profile.
     Raises 401 if token is invalid, expired, or missing.
     """
+    settings = get_settings()
+    
+    if not settings.auth_enabled:
+        uid = "demo-user"
+        current_user_id.set(uid)
+        return UserProfile(
+            uid=uid,
+            email="demo@kairos.one",
+            display_name="Demo User",
+            photo_url=None,
+            provider="demo",
+        )
+        
+    if not credentials:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authenticated"
+        )
+        
     token = credentials.credentials
     try:
         # Verify token synchronously in a fast call to memory/cached keys
