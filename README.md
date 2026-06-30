@@ -1,4 +1,3 @@
-[Kairos_One_Hackathon_Submission.md](https://github.com/user-attachments/files/29526231/Kairos_One_Hackathon_Submission.md)
 # Kairos One
 **Hackathon Submission: The Last-Minute Life Saver**
 
