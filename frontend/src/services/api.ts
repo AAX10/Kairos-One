@@ -21,7 +21,8 @@ import type {
 
 import { auth } from "@/lib/firebase";
 
-const API_BASE = "http://127.0.0.1:8000/api/v1";
+const API_BASE =
+  `${process.env.NEXT_PUBLIC_API_URL}/api/v1`;
 
 async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
   const headers: Record<string, string> = {
@@ -102,7 +103,7 @@ export async function toggleTaskComplete(id: string): Promise<MissionNode | null
   // We need to fetch it first to toggle
   const node = await getMissionById(id);
   if (!node) return null;
-  
+
   const isCompleting = node.status !== "completed";
   return updateMissionNode(id, {
     status: isCompleting ? "completed" : "pending",
@@ -282,8 +283,8 @@ export async function getWeekEvents(): Promise<CalendarEvent[]> {
   return fetchJson<CalendarEvent[]>("/calendar/events/week");
 }
 
-export async function refreshCalendar(): Promise<{status: string}> {
-  return fetchJson<{status: string}>("/calendar/refresh", {
+export async function refreshCalendar(): Promise<{ status: string }> {
+  return fetchJson<{ status: string }>("/calendar/refresh", {
     method: "POST",
   });
 }
