@@ -10,11 +10,6 @@ from orchestrator.mission_orchestrator import get_orchestrator
 from schemas.agent import AgentRunRequest, AgentRunResponse, AgentPipelineState
 from services.firestore_service import get_firestore_service
 from utils.exceptions import MissionNotFoundException
-from agents.planner_agent import PlannerAgent
-from agents.scheduler_agent import SchedulerAgent
-from agents.risk_agent import RiskAgent
-from agents.recovery_agent import RecoveryAgent
-from agents.coach_agent import CoachAgent
 
 router = APIRouter(prefix="/agents", tags=["Agents"], dependencies=[Depends(get_current_user)])
 
