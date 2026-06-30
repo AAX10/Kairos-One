@@ -11,13 +11,15 @@ from services.gemini_service import get_gemini_service
 from utils.helpers import iso_now, generate_id, today_at, hours_ago
 from pydantic import BaseModel
 
+from schemas.agent_io import AgentContext
+
 
 class DashboardEngine:
     def __init__(self) -> None:
         self._firestore = get_firestore_service()
         self._gemini = get_gemini_service()
 
-    async def update_dashboard(self, risk_assessment: RiskAssessment | None = None, context: 'AgentContext' = None) -> None:
+    async def update_dashboard(self, risk_assessment: RiskAssessment | None = None, context: AgentContext | None = None) -> None:
         """Trigger dynamic calculation of the dashboard and persist updates."""
         await self._calculate_mission_success(risk_assessment)
         await self._generate_day_brief(risk_assessment)
