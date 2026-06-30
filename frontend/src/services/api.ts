@@ -30,6 +30,7 @@ async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
     ...(options?.headers as Record<string, string> || {}),
   };
 
+  await auth.authStateReady();
   const user = auth.currentUser;
   if (user) {
     const token = await user.getIdToken();
