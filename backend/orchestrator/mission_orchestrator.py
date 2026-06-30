@@ -371,8 +371,17 @@ class MissionOrchestrator:
                     self._update_agent_state(i, s)
         finally:
             self._pipeline_state.is_running = False
-            duration_ms = (time.perf_counter() - pipeline_start) * 1000
-            self._execution_logger.pipeline_completed(trigger, duration_ms)
+            _mission = locals().get('mission', None)
+            self._pipeline_state.trigger = f"Analysis Complete: {_mission.name}" if _mission else "Idle"
+            
+            # Persist final state to Firestore so UI doesn't fallback to 'Waiting'
+            try:
+                # We need to await this, but we're in a finally block, which is safe for async
+                await self._firestore.update_pipeline(self._pipeline_state)
+            except Exception as e:
+                logger.error("Failed to persist final pipeline state: %s", str(e))
+                
+            self._execution_logger.pipeline_completed(trigger, (time.perf_counter() - pipeline_start) * 1000)
 
     async def _update_mission_success(self, mission: MissionNode, risk: RiskAssessment) -> None:
         """Update global Mission Success based on risk."""

@@ -180,16 +180,24 @@ class DashboardEngine:
         # Deterministic generation
         active_missions = [m for m in missions if m.status in [MissionNodeStatus.PENDING, MissionNodeStatus.IN_PROGRESS]]
         
-        focus = f"Advance {len(active_missions)} active missions." if active_missions else "Create a mission to initialize the autonomous AI pipeline."
+        if active_missions:
+            primary = active_missions[0]
+            focus = f"Focus on advancing '{primary.name}'."
+            deep_work = f"Schedule a 90-minute deep work block to tackle tasks for '{primary.name}'."
+        else:
+            focus = "Create a mission to initialize the autonomous AI pipeline."
+            deep_work = "Awaiting calendar sync and mission creation."
         highest_risk = risk_assessment.mission_name if risk_assessment and risk_assessment.risk_level in ["high", "critical"] else "None detected"
+        success = await self._firestore.get_mission_success()
+        confidence = success.confidence if success else 100
         
         brief = DayBrief(
             greeting="Good Morning.",
             todays_focus=focus,
             critical_mission=active_missions[0].name if active_missions else "None active",
             highest_risk=highest_risk,
-            deep_work_recommendation="Schedule 2 hours of deep work today.",
-            expected_productivity="High",
+            deep_work_recommendation=deep_work,
+            expected_productivity=f"{confidence}%",
             completion_estimate="On Track" if not risk_assessment or risk_assessment.risk_level == "low" else "At Risk",
             upcoming_deadlines="No immediate deadlines in the next 24 hours.",
         )

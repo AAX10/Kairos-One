@@ -234,6 +234,10 @@ class FirestoreService:
         return await self._track_write("UpdateRecoveryPlan", self._repo.update_recovery_plan, self._cache.invalidate_recovery, plan)
 
     @fallback_on_error(None)
+    async def update_pipeline(self, state: AgentPipelineState) -> None:
+        return await self._track_write("UpdatePipeline", self._repo.update_pipeline, self._cache.agent_status_cache.clear, state)
+
+    @fallback_on_error(None)
     async def get_planner_cache(self, mission_id: str) -> dict | None:
         return self._repo.get_planner_cache(mission_id)
 

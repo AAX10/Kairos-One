@@ -257,6 +257,9 @@ class FirestoreRepository:
             batch.set(doc_ref, i.model_dump(mode="json", by_alias=False))
         batch.commit()
 
+    def update_pipeline(self, state: AgentPipelineState) -> None:
+        self._get_collection("pipeline").document("state").set(state.model_dump(mode="json", by_alias=False))
+
     def get_pipeline(self) -> AgentPipelineState:
         doc = self._get_collection("pipeline").document("state").get()
         if doc.exists:
