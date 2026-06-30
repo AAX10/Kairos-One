@@ -3,7 +3,6 @@
 # =============================================================================
 
 from fastapi import APIRouter, Depends
-
 from api.dependencies import get_current_user
 
 from api.agents import router as agents_router

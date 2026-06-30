@@ -1,6 +1,5 @@
 # =============================================================================
 # Kairos One — Central API Router
-# Assembles all sub-routers under the /api/v1 prefix.
 # =============================================================================
 
 from fastapi import APIRouter, Depends
@@ -15,15 +14,29 @@ from api.users import router as users_router
 from api.calendar import router as calendar_router
 from api.memory import router as memory_router
 
-api_router = APIRouter(prefix="/api/v1", dependencies=[Depends(get_current_user)])
+# Root API router
+api_router = APIRouter(prefix="/api/v1")
 
-# Mount all sub-routers
+# --------------------------------------------------------------------------
+# Public Routes (No Authentication)
+# --------------------------------------------------------------------------
+
 api_router.include_router(health_router)
 api_router.include_router(dashboard_router)
-api_router.include_router(missions_router)
-api_router.include_router(agents_router)
-api_router.include_router(users_router)
-api_router.include_router(database_router)
-api_router.include_router(calendar_router)
-api_router.include_router(memory_router)
 
+# --------------------------------------------------------------------------
+# Protected Routes (Require Authentication)
+# --------------------------------------------------------------------------
+
+protected_router = APIRouter(
+    dependencies=[Depends(get_current_user)]
+)
+
+protected_router.include_router(missions_router)
+protected_router.include_router(agents_router)
+protected_router.include_router(users_router)
+protected_router.include_router(database_router)
+protected_router.include_router(calendar_router)
+protected_router.include_router(memory_router)
+
+api_router.include_router(protected_router)
