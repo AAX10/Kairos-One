@@ -111,7 +111,7 @@ class FirestoreRepository:
             assigned_agent="planner",
             color="#60a5fa",
         )
-        self._get_collection("missions").document(mission_id).set(new_mission.model_dump(by_alias=False))
+        self._get_collection("missions").document(mission_id).set(new_mission.model_dump(mode="json", by_alias=False))
         return new_mission
 
     def update_mission(self, mission_id: str, updates: dict[str, Any]) -> MissionNode | None:
@@ -123,7 +123,7 @@ class FirestoreRepository:
         current_data = doc.to_dict()
         current_data.update(updates)
         updated_mission = MissionNode.model_validate(current_data)
-        doc_ref.set(updated_mission.model_dump(by_alias=False))
+        doc_ref.set(updated_mission.model_dump(mode="json", by_alias=False))
         return updated_mission
 
     def delete_mission(self, mission_id: str) -> bool:
@@ -151,7 +151,7 @@ class FirestoreRepository:
             status=MilestoneStatus.PENDING,
             created_at=iso_now()
         )
-        self._get_collection("milestones").document(m_id).set(milestone.model_dump(by_alias=False))
+        self._get_collection("milestones").document(m_id).set(milestone.model_dump(mode="json", by_alias=False))
         return milestone
 
     def get_milestones(self, mission_id: str) -> list[Any]:
@@ -168,7 +168,7 @@ class FirestoreRepository:
         current_data = doc.to_dict()
         current_data.update(updates)
         updated_milestone = Milestone.model_validate(current_data)
-        doc_ref.set(updated_milestone.model_dump(by_alias=False))
+        doc_ref.set(updated_milestone.model_dump(mode="json", by_alias=False))
         return updated_milestone
 
     # -------------------------------------------------------------------------
@@ -208,7 +208,7 @@ class FirestoreRepository:
 
     def add_agent_activity(self, activity: AgentActivity) -> None:
         doc_ref = self._get_collection("activities").document(activity.id)
-        doc_ref.set(activity.model_dump(by_alias=False))
+        doc_ref.set(activity.model_dump(mode="json", by_alias=False))
 
     def get_calendar_events(self) -> list[CalendarEvent]:
         docs = self._get_collection("calendar_events").stream()
@@ -254,7 +254,7 @@ class FirestoreRepository:
             batch.delete(doc)
         for i in integrations:
             doc_ref = integrations_ref.document(i.id if hasattr(i, 'id') else i.service)
-            batch.set(doc_ref, i.model_dump(by_alias=False))
+            batch.set(doc_ref, i.model_dump(mode="json", by_alias=False))
         batch.commit()
 
     def get_pipeline(self) -> AgentPipelineState:
@@ -303,13 +303,13 @@ class FirestoreRepository:
     # -------------------------------------------------------------------------
 
     def update_user_profile(self, profile: UserProfile) -> None:
-        self._get_collection("users").document(profile.uid).set(profile.model_dump(by_alias=False))
+        self._get_collection("users").document(profile.uid).set(profile.model_dump(mode="json", by_alias=False))
 
     def update_mission_success(self, success: MissionSuccess) -> None:
-        self._get_collection("dashboard").document("mission_success").set(success.model_dump(by_alias=False))
+        self._get_collection("dashboard").document("mission_success").set(success.model_dump(mode="json", by_alias=False))
 
     def update_day_brief(self, brief: DayBrief) -> None:
-        self._get_collection("dashboard").document("day_brief").set(brief.model_dump(by_alias=False))
+        self._get_collection("dashboard").document("day_brief").set(brief.model_dump(mode="json", by_alias=False))
 
     def update_timeline(self, timeline: list[TimeBlock]) -> None:
         # Delete existing timeline docs first to mimic overwrite behavior
@@ -320,7 +320,7 @@ class FirestoreRepository:
         # Add new timeline
         for block in timeline:
             doc_ref = self._get_collection("timeline").document(block.id)
-            batch.set(doc_ref, block.model_dump(by_alias=False))
+            batch.set(doc_ref, block.model_dump(mode="json", by_alias=False))
         batch.commit()
 
     def update_recommendations(self, recs: list[AIRecommendation]) -> None:
@@ -330,7 +330,7 @@ class FirestoreRepository:
             batch.delete(doc.reference)
         for rec in recs:
             doc_ref = self._get_collection("recommendations").document(rec.id)
-            batch.set(doc_ref, rec.model_dump(by_alias=False))
+            batch.set(doc_ref, rec.model_dump(mode="json", by_alias=False))
         batch.commit()
 
     def update_calendar_events(self, events: list[CalendarEvent]) -> None:
@@ -365,7 +365,7 @@ class FirestoreRepository:
 
     def update_recovery_plan(self, plan: RecoveryPlan) -> None:
         doc_ref = self._get_collection("dashboard").document("recovery_plan")
-        doc_ref.set(plan.model_dump(by_alias=False))
+        doc_ref.set(plan.model_dump(mode="json", by_alias=False))
 
     def get_planner_cache(self, mission_id: str) -> dict | None:
         doc = self._get_collection("agent_cache").document(f"planner_{mission_id}").get()

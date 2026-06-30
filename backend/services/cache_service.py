@@ -15,42 +15,43 @@ class CacheService:
     def __init__(self) -> None:
         # Define TTLCaches per domain with maximum size of 100 items each
         
-        # Dashboard: 30 seconds
-        self.dashboard_cache = TTLCache(maxsize=100, ttl=30)
-        self.day_brief_cache = TTLCache(maxsize=100, ttl=30)
+        # Disable caching for hackathon demo to prevent multi-worker state inconsistencies
+        # Dashboard
+        self.dashboard_cache = TTLCache(maxsize=100, ttl=0)
+        self.day_brief_cache = TTLCache(maxsize=100, ttl=0)
         
-        # Timeline: 30 seconds
-        self.timeline_cache = TTLCache(maxsize=100, ttl=30)
+        # Timeline
+        self.timeline_cache = TTLCache(maxsize=100, ttl=0)
         
-        # Calendar Events: 5 minutes (300s)
-        self.calendar_events_cache = TTLCache(maxsize=100, ttl=300)
+        # Calendar Events
+        self.calendar_events_cache = TTLCache(maxsize=100, ttl=0)
         
-        # Recommendations: 60 seconds
-        self.recommendations_cache = TTLCache(maxsize=100, ttl=60)
+        # Recommendations
+        self.recommendations_cache = TTLCache(maxsize=100, ttl=0)
         
-        # Mission Success: 30 seconds
-        self.mission_success_cache = TTLCache(maxsize=100, ttl=30)
+        # Mission Success
+        self.mission_success_cache = TTLCache(maxsize=100, ttl=0)
         
-        # Insights: 60 seconds
-        self.insights_cache = TTLCache(maxsize=100, ttl=60)
+        # Insights
+        self.insights_cache = TTLCache(maxsize=100, ttl=0)
         
-        # Agent Status & Activities: 10 seconds
-        self.agent_status_cache = TTLCache(maxsize=100, ttl=10)
-        self.agent_activities_cache = TTLCache(maxsize=100, ttl=10)
+        # Agent Status & Activities
+        self.agent_status_cache = TTLCache(maxsize=100, ttl=0)
+        self.agent_activities_cache = TTLCache(maxsize=100, ttl=0)
         
-        # Calendar Credentials: 1 hour (3600s)
-        self.calendar_credentials_cache = TTLCache(maxsize=10, ttl=3600)
+        # Calendar Credentials
+        self.calendar_credentials_cache = TTLCache(maxsize=10, ttl=0)
         
-        # User Profile: 10 minutes (600s)
-        self.user_profile_cache = TTLCache(maxsize=100, ttl=600)
+        # User Profile
+        self.user_profile_cache = TTLCache(maxsize=100, ttl=0)
         
-        # Memory Search: 2 minutes (120s)
-        self.memory_cache = TTLCache(maxsize=500, ttl=120)
+        # Memory Search
+        self.memory_cache = TTLCache(maxsize=500, ttl=0)
         
         # Core Models (Missions, Milestones, Integrations)
-        self.missions_cache = TTLCache(maxsize=500, ttl=30)
-        self.milestones_cache = TTLCache(maxsize=500, ttl=30)
-        self.integrations_cache = TTLCache(maxsize=100, ttl=30)
+        self.missions_cache = TTLCache(maxsize=500, ttl=0)
+        self.milestones_cache = TTLCache(maxsize=500, ttl=0)
+        self.integrations_cache = TTLCache(maxsize=100, ttl=0)
         
         logger.info("CacheService initialized with in-memory TTL caching.")
 
