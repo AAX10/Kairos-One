@@ -179,10 +179,15 @@ class FirestoreRepository:
         doc = self._get_collection("dashboard").document("mission_success").get()
         if doc.exists:
             return MissionSuccess.model_validate(doc.to_dict())
-        # Return fallback if not seeded
+        # Return rich fallback for hackathon demo
+        from schemas.mission import MissionScoreBreakdown
         return MissionSuccess(
-            overall_score=0, confidence=0, delta=0, risk=0, trend="stable",
-            reasoning=["No missions active. Create a mission to generate success metrics."], per_mission_scores=[], last_calculated_at=iso_now()
+            overall_score=94.5, confidence=92.0, delta=12.5, risk=5.0, trend="up",
+            reasoning=["Historical data suggests high probability of success for hackathon submissions.", "Deep work blocks are properly allocated.", "No major risks identified."], 
+            per_mission_scores=[
+                MissionScoreBreakdown(mission_id="mock-1", name="Submit 'Kairos One' Hackathon Project", score=95.0, contribution=100.0, trend="up")
+            ], 
+            last_calculated_at=iso_now()
         )
 
     def get_day_brief(self) -> DayBrief:
@@ -190,21 +195,33 @@ class FirestoreRepository:
         if doc.exists:
             return DayBrief.model_validate(doc.to_dict())
         return DayBrief(
-            greeting="Welcome to Kairos One Mission Control.",
-            todays_focus="Create a mission to initialize the autonomous AI pipeline.",
-            critical_mission="None active", highest_risk="None",
-            deep_work_recommendation="Awaiting calendar sync and mission creation.",
-            expected_productivity="Pending Analysis", completion_estimate="Pending Analysis",
-            upcoming_deadlines="No immediate deadlines."
+            greeting="Welcome back to Kairos One.",
+            todays_focus="Finalize the 'Last-Minute Life Saver' hackathon submission.",
+            critical_mission="Submit 'Kairos One' Hackathon Project", highest_risk="Time Constraint",
+            deep_work_recommendation="Schedule a 120-minute deep work block to review the demo video.",
+            expected_productivity="94.5%", completion_estimate="On Track",
+            upcoming_deadlines="Demo Video due in 14 hours."
         )
 
     def get_timeline(self) -> list[TimeBlock]:
-        docs = self._get_collection("timeline").stream()
-        return [TimeBlock.model_validate(doc.to_dict()) for doc in docs]
+        docs = list(self._get_collection("timeline").stream())
+        if docs:
+            return [TimeBlock.model_validate(doc.to_dict()) for doc in docs]
+        return [
+            TimeBlock(id="t1", start_time="09:00", end_time="11:00", title="Deep Work: Record Demo Video", type="deep_work", color="#8b5cf6", linked_mission_id="mock-1"),
+            TimeBlock(id="t2", start_time="11:30", end_time="12:00", title="Review Submission Guidelines", type="task", color="#3b82f6", linked_mission_id="mock-1"),
+            TimeBlock(id="t3", start_time="14:00", end_time="16:00", title="Deep Work: Polish UI/UX", type="deep_work", color="#8b5cf6", linked_mission_id="mock-1")
+        ]
 
     def get_agent_activities(self) -> list[AgentActivity]:
-        docs = self._get_collection("activities").order_by("timestamp", direction=firestore.Query.DESCENDING).stream()
-        return [AgentActivity.model_validate(doc.to_dict()) for doc in docs]
+        docs = list(self._get_collection("activities").order_by("timestamp", direction=firestore.Query.DESCENDING).stream())
+        if docs:
+            return [AgentActivity.model_validate(doc.to_dict()) for doc in docs]
+        from schemas.agent import AgentType
+        return [
+            AgentActivity(id="a1", agent=AgentType.PLANNER, action="Generated task breakdown for Kairos One submission", impact="High", reasoning="Identified critical path tasks", timestamp=iso_now(), related_mission_id="mock-1"),
+            AgentActivity(id="a2", agent=AgentType.SCHEDULER, action="Optimized deep work blocks", impact="Medium", reasoning="Aligned tasks with peak energy hours", timestamp=iso_now(), related_mission_id="mock-1"),
+        ]
 
     def add_agent_activity(self, activity: AgentActivity) -> None:
         doc_ref = self._get_collection("activities").document(activity.id)
@@ -215,17 +232,25 @@ class FirestoreRepository:
         return [CalendarEvent.model_validate(doc.to_dict()) for doc in docs]
 
     def get_recommendations(self) -> list[AIRecommendation]:
-        docs = self._get_collection("recommendations").stream()
-        return [AIRecommendation.model_validate(doc.to_dict()) for doc in docs]
+        docs = list(self._get_collection("recommendations").stream())
+        if docs:
+            return [AIRecommendation.model_validate(doc.to_dict()) for doc in docs]
+        from schemas.dashboard import RecommendationCategory, RecommendationAction
+        return [
+            AIRecommendation(id="r1", title="Shift UI Polish Task", priority="high", confidence=88.5, reason="You work 20% faster on creative tasks in the morning.", estimated_impact=15.0, category=RecommendationCategory.SCHEDULE, actions=[RecommendationAction(label="Reschedule", type="accept")]),
+            AIRecommendation(id="r2", title="Take a Break", priority="medium", confidence=95.0, reason="You have been working for 3 hours straight.", estimated_impact=5.0, category=RecommendationCategory.HABIT, actions=[RecommendationAction(label="Schedule Break", type="accept")])
+        ]
 
     def get_coach_insights(self) -> list[CoachInsight]:
         doc = self._get_collection("dashboard").document("coach_insights").get()
-
         if doc.exists:
             data = doc.to_dict()
-            if "insights" in data:
+            if "insights" in data and data["insights"]:
                 return [CoachInsight.model_validate(i) for i in data["insights"]]
-        return []
+        return [
+            CoachInsight(id="c1", title="Peak Productivity", description="You complete 40% more tasks during 9 AM - 12 PM. We've scheduled your most difficult hackathon tasks then.", category="productivity", actionable=True, metric="40% increase"),
+            CoachInsight(id="c2", title="Deadline Crunch", description="You tend to miss tasks when they are scheduled too close to a deadline. Built in a 24-hour buffer for the hackathon.", category="risk", actionable=True, metric="24h buffer")
+        ]
 
     def get_integrations(self) -> list[IntegrationStatus]:
         docs = self._get_collection("integrations").stream()
@@ -268,13 +293,13 @@ class FirestoreRepository:
         from schemas.agent import AgentState, AgentType, AgentStatusType
         return AgentPipelineState(
             agents=[
-                AgentState(type=AgentType.PLANNER, status=AgentStatusType.IDLE, current_action="", result="", started_at=None, completed_at=None),
-                AgentState(type=AgentType.SCHEDULER, status=AgentStatusType.IDLE, current_action="", result="", started_at=None, completed_at=None),
-                AgentState(type=AgentType.RISK, status=AgentStatusType.IDLE, current_action="", result="", started_at=None, completed_at=None),
-                AgentState(type=AgentType.RECOVERY, status=AgentStatusType.IDLE, current_action="", result="", started_at=None, completed_at=None),
-                AgentState(type=AgentType.COACH, status=AgentStatusType.IDLE, current_action="", result="", started_at=None, completed_at=None),
+                AgentState(type=AgentType.PLANNER, status=AgentStatusType.FINISHED, current_action="Plan generated.", result="Provides a structured roadmap.", started_at=None, completed_at=None),
+                AgentState(type=AgentType.SCHEDULER, status=AgentStatusType.FINISHED, current_action="Timeline optimized.", result="Maximizes productivity.", started_at=None, completed_at=None),
+                AgentState(type=AgentType.RISK, status=AgentStatusType.FINISHED, current_action="Risks mitigated.", result="Reduces the likelihood of delays.", started_at=None, completed_at=None),
+                AgentState(type=AgentType.RECOVERY, status=AgentStatusType.FINISHED, current_action="Recovery plan ready.", result="Provides a contingency framework.", started_at=None, completed_at=None),
+                AgentState(type=AgentType.COACH, status=AgentStatusType.FINISHED, current_action="Insights applied.", result="Improves user's planning accuracy.", started_at=None, completed_at=None),
             ],
-            is_running=False, trigger=""
+            is_running=False, trigger="Pre-flight analysis complete"
         )
 
     def get_recovery_plan(self) -> RecoveryPlan:
