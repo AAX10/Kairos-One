@@ -20,7 +20,7 @@ export function MorningBrief() {
   useCalendarSync(); // Polling hook for background calendar refresh
 
   if (isLoading) {
-    return <SkeletonCard className="col-span-full lg:col-span-1" lines={5} />;
+    return <SkeletonCard className="col-span-full lg:col-span-1" lines={5} showWaitMessage={true} />;
   }
 
   if (isError) {

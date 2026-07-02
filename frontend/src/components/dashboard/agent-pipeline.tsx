@@ -99,7 +99,7 @@ export function AgentPipeline() {
   // Pipeline is triggered by user actions (like mission creation)
 
   if (isLoading) {
-    return <SkeletonCard className="col-span-full" lines={2} />;
+    return <SkeletonCard className="col-span-full min-h-[160px]" lines={3} showWaitMessage={true} />;
   }
 
   // Not checking isError here to avoid hiding pipeline during intermittent polling failures
