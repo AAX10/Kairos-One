@@ -36,7 +36,7 @@ export function SkeletonCard({ className, lines = 3, showWaitMessage }: Skeleton
             Waking up server...
           </p>
           <p className="text-xs text-muted-foreground text-center mt-1 px-4 max-w-[250px]">
-            Please wait 20-30 seconds for the free tier backend to spin up.
+            Please wait 20-30 seconds for the backend to spin up.
           </p>
         </div>
       )}
